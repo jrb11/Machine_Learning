@@ -1,0 +1,65 @@
+# Using Python as a programming language and numpy, pandas, sklearn as the libraries used to preprocess and train the models for prediction. 
+import numpy as np
+import pandas as pd 
+
+import os
+for dirname, _, filenames in os.walk('../input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+print("Sucessfully Load File")
+
+
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
+print("Load libraries")
+
+# load the data (train.csv and test.csv file)
+
+train_file_path = '../input/mldatatraintest/train.csv'
+train_data = pd.read_csv(train_file_path)
+
+test_file_path = '../input/mldatatraintest/test.csv'
+test_data = pd.read_csv(test_file_path)
+print("Load csv")
+
+#  Create y using SalesPrice
+y = train_data.SalePrice
+print("Create y ")
+
+# Create X using features
+features = ['MSSubClass', 'LotArea', 'OverallQual', 'OverallCond', 'YearBuilt', 'YearRemodAdd', '1stFlrSF', '2ndFlrSF', 'LowQualFinSF', 'GrLivArea', 'FullBath', 'HalfBath',
+            'BedroomAbvGr', 'KitchenAbvGr', 'TotRmsAbvGrd', 'Fireplaces', 'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'PoolArea', 'MiscVal',
+            'MoSold', 'YrSold']
+X = train_data[features]
+print("Create X ")
+
+# Split train data
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state = 1)
+print("Create split data")
+
+
+# Create RandomForest on train data
+rf_train_data = RandomForestRegressor(random_state = 1)
+rf_train_data.fit(train_X, train_y)
+rf_train_data_predicition = rf_train_data.predict(val_X)
+print("Create Random Forest and Prediction")
+
+# Create RandomForest on all train data
+rf_train_all_data = RandomForestRegressor(random_state = 1)
+rf_train_all_data.fit(X, y)
+print("Create Random Forest for all data")
+
+# create test_X which comes from test_data 
+test_X = test_data[features]
+
+# make predictions which we will submit. 
+test_prediction = rf_train_all_data.predict(test_X)
+#print(test_prediction.shape)
+
+# Run the code to save predictions in csv format
+
+output = pd.DataFrame({'Id': test_data.Id,
+                       'SalePrice': test_prediction})
+output.to_csv('submission.csv', index=False)
+print("csv created")
