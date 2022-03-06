@@ -1,0 +1,127 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Lasso
+from sklearn import metrics
+
+dataset = pd.read_csv('/content/car data.csv')
+print(dataset.head())
+
+Car_Name        company  Year  Selling_Price  Present_Price  Kms_Driven  \
+0     ritz  maruti suzuki  2014           3.35           5.59       27000   
+1      sx4  maruti suzuki  2013           4.75           9.54       43000   
+2     ciaz  maruti suzuki  2017           7.25           9.85        6900   
+3  wagon r  maruti suzuki  2011           2.85           4.15        5200   
+4    swift  maruti suzuki  2014           4.60           6.87       42450   
+
+  Fuel_Type Seller_Type Transmission  Owner  
+0    Petrol      Dealer       Manual      0  
+1    Diesel      Dealer       Manual      0  
+2    Petrol      Dealer       Manual      0  
+3    Petrol      Dealer       Manual      0  
+4    Diesel      Dealer       Manual      0  
+
+dataset.shape
+(301, 10)
+
+dataset.info()
+
+dataset.isnull().sum
+Car_Name         0
+company          0
+Year             0
+Selling_Price    0
+Present_Price    0
+Kms_Driven       0
+Fuel_Type        0
+Seller_Type      0
+Transmission     0
+Owner            0
+dtype: int64
+
+# Distribution of Fuel Type 
+dataset.Fuel_Type.value_counts()
+Petrol    239
+Diesel     60
+CNG         2
+Name: Fuel_Type, dtype: int64
+
+# Distribution of Seller_type 
+dataset.Seller_Type.value_counts()
+Dealer        195
+Individual    106
+Name: Seller_Type, dtype: int64
+
+# Distribution of Transmission
+dataset.Transmission.value_counts()
+Manual       261
+Automatic     40
+Name: Transmission, dtype: int6
+
+# Machine Understand Numeric value so enconding Text to Value 
+# For Fuel, Seller_Type, Transmission
+
+dataset.replace({'Fuel_Type':{'Petrol':0, 'Diesel':1, 'CNG':2}}, inplace=True)
+
+dataset.replace({'Seller_Type':{'Dealer':0, 'Individual':1}}, inplace=True)
+
+dataset.replace({'Transmission':{'Manual':0, 'Automatic':1}}, inplace=True)
+
+dataset.head()
+Car_Name	company	Year	Selling_Price	Present_Price	Kms_Driven	Fuel_Type	Seller_Type	Transmission	Owner
+0	ritz	maruti suzuki	2014	3.35	5.59	27000	0	0	0	0
+1	sx4	maruti suzuki	2013	4.75	9.54	43000	1	0	0	0
+2	ciaz	maruti suzuki	2017	7.25	9.85	6900	0	0	0	0
+3	wagon r	maruti suzuki	2011	2.85	4.15	5200	0	0	0	0
+4	swift	maruti suzuki	2014	4.60	6.87	42450	1	0	0	0
+
+# Splitting the Data in to Train and Test
+X = dataset.drop(['Car_Name', 'company','Selling_Price'],axis=1)
+Y = dataset['Selling_Price']
+#X.head()
+#Y.head()
+
+# Splitting a Data
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.1, random_state=2)
+# 10% Test
+# 90% Train
+
+Lasso Regression
+--Train Data--
+
+# Train Model
+# Lasso Regression
+las_reg_mdl = Lasso()
+
+las_reg_mdl.fit(X_train, Y_train)
+-> Lasso()
+
+# Model Evaluation
+train_data_pre = las_reg_mdl.predict(X_train)
+
+# R Square Error - Train Data  [ 0:Best, 10:Worst]
+r_sq_err = metrics.r2_score(Y_train, train_data_pre)
+print("R Square Error:", r_sq_err)
+-> R Square Error: 0.8427856123435794
+
+#Visuliaze actual and predict - Train Data
+plt.scatter(Y_train, train_data_pre)
+plt.xlabel("Actual Price ")
+plt.ylabel("Predicted Price")
+plt.title("Actual vs Predicted - Lasso (Train)")
+plt.show()
+
+--Test Data--
+test_data_pre = las_reg_mdl.predict(X_test)
+# R Square Error - Test  [ 0:Best, 10:Worst]
+r_sq_err = metrics.r2_score(Y_test, test_data_pre)
+print("R Square Error:", r_sq_err)
+-> R Square Error: 0.8709167941173195
+
+#Visuliaze actual and predict - Test Data
+plt.scatter(Y_test, test_data_pre)
+plt.xlabel("Actual Price ")
+plt.ylabel("Predicted Price")
+plt.title("Actual vs Predicted - Lasso (Test)")
+plt.show()
+
