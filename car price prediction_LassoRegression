@@ -114,6 +114,7 @@ plt.show()
 --Test Data--
 test_data_pre = las_reg_mdl.predict(X_test)
 # R Square Error - Test  [ 0:Best, 10:Worst]
+
 r_sq_err = metrics.r2_score(Y_test, test_data_pre)
 print("R Square Error:", r_sq_err)
 -> R Square Error: 0.8709167941173195
